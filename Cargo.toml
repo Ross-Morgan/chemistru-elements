@@ -1,7 +1,15 @@
 [package]
 name = "chemistru-elements"
+readme = "README.md"
+description = "Basic Elemental Representation"
+
+homepage = "https://github.com/Ross-Morgan/chemistru-elements"
+repository = "https://github.com/Ross-Morgan/chemistru-elements"
+
 version = "0.1.0"
 edition = "2021"
+
+license = "GPLv3"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
