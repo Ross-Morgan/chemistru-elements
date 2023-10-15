@@ -1,9 +1,12 @@
-#[derive(Copy, Clone, Debug, PartialEq, PartialOrd)]
+use crate::raw::RawElement;
+
+#[derive(Copy, Clone, Debug)]
 pub struct Element {
     name: &'static str,
     symbol: &'static str,
     atomic_mass: f64,
     atomic_number: u8,
+    raw: &'static RawElement,
 }
 
 impl Element {
@@ -28,12 +31,14 @@ impl Element {
         symbol: &'static str,
         atomic_mass: f64,
         atomic_number: u8,
+        raw: &'static RawElement
     ) -> Self {
         Self {
             name,
             symbol,
             atomic_mass,
             atomic_number,
+            raw,
         }
     }
 }
