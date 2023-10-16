@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 #[allow(dead_code)]
-#[derive(Copy, Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct RawElement {
     pub name: &'static str,
     pub appearance: Option<&'static str>,
@@ -27,7 +27,7 @@ pub struct RawElement {
     pub electron_configuration_semantic: &'static str,
     pub electron_affinity: Option<f64>,
     pub electronegativity_pauling: Option<f64>,
-    pub ionization_energies: &'static [Option<f64>; 30],
+    pub ionization_energies: Vec<f64>,
     pub cpk_hex: Option<&'static str>,
 }
 
@@ -36,20 +36,32 @@ impl RawElement {
         InnerElement {
             name: self.name,
             symbol: self.symbol,
-            atomic_data: AtomicData { atomic_number: self.number, nucleon_number: self.atomic_mass.round() as u16, atomic_mass: self.atomic_mass },
-            state_data: StateData { boiling_point: self.boil, melting_point: self.melt },
-            ion_data: IonData { electron_configuration: ElectronConfiguration }
+            description: self.summary,
+            atomic_data: AtomicData {
+                atomic_number: self.number,
+                nucleon_number: self.atomic_mass.round() as u16,
+                atomic_mass: self.atomic_mass,
+            },
+            state_data: StateData {
+                boiling_point: self.boil,
+                melting_point: self.melt,
+            },
+            electron_data: ElectronData {
+                electron_configuration: ElectronConfiguration {},
+                ionisation_energies: self.ionization_energies,
+            },
         }
     }
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, PartialOrd)]
+#[derive(Clone, Debug, PartialEq, PartialOrd)]
 pub struct InnerElement {
     pub name: &'static str,
     pub symbol: &'static str,
+    pub description: &'static str,
     pub atomic_data: AtomicData,
     pub state_data: StateData,
-    pub ion_data: IonData,
+    pub electron_data: ElectronData,
 }
 
 #[derive(Copy, Clone, Debug, PartialEq, PartialOrd)]
@@ -65,19 +77,11 @@ pub struct StateData {
     pub melting_point: Option<f64>,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, PartialOrd)]
-pub struct IonData {
+#[derive(Clone, Debug, PartialEq, PartialOrd)]
+pub struct ElectronData {
     pub electron_configuration: ElectronConfiguration,
     pub ionisation_energies: Vec<f64>,
 }
 
 #[derive(Copy, Clone, Debug, PartialEq, PartialOrd)]
-pub struct ElectronConfiguration {
-    
-}
-
-impl ElectronConfiguration {
-    pub fn to_semantic_string(&self) -> String {
-        
-    }
-}
+pub struct ElectronConfiguration {}
