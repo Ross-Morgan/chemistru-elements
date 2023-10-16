@@ -1,12 +1,12 @@
-use crate::raw::RawElement;
+use crate::raw::InnerElement;
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Debug, Clone)]
 pub struct Element {
     name: &'static str,
     symbol: &'static str,
     atomic_mass: f64,
     atomic_number: u8,
-    raw: &'static RawElement,
+    raw: &'static InnerElement,
 }
 
 impl Element {
@@ -26,12 +26,16 @@ impl Element {
         self.atomic_number
     }
 
+    pub const fn data(&self) -> &'static InnerElement {
+        self.raw
+    }
+
     pub const fn new(
         name: &'static str,
         symbol: &'static str,
         atomic_mass: f64,
         atomic_number: u8,
-        raw: &'static RawElement
+        raw: &'static InnerElement,
     ) -> Self {
         Self {
             name,
