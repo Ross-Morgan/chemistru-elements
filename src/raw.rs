@@ -1,4 +1,11 @@
+use proc_macro2::{TokenStream, Group, Delimiter, TokenTree};
+use quote::{TokenStreamExt, ToTokens, quote};
 use serde::{Deserialize, Serialize};
+use staticvec::StaticVec;
+
+use crate::data::electron::orbital;
+
+use super::data::prelude::*;
 
 #[allow(dead_code)]
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -33,6 +40,10 @@ pub struct RawElement {
 
 impl RawElement {
     pub fn into_inner(self) -> InnerElement {
+        let electron_configuration = self.electron_configuration
+            .split(" ")
+            .map(parse_suborbital);
+
         InnerElement {
             name: self.name,
             symbol: self.symbol,
@@ -47,41 +58,40 @@ impl RawElement {
                 melting_point: self.melt,
             },
             electron_data: ElectronData {
-                electron_configuration: ElectronConfiguration {},
-                ionisation_energies: self.ionization_energies,
+                electron_configuration: ElectronConfiguration(electron_configuration),
+                ionisation_energies: StaticVec::new_from_slice(self.ionization_energies.as_slice()),
             },
         }
     }
 }
 
-#[derive(Clone, Debug, PartialEq, PartialOrd)]
-pub struct InnerElement {
-    pub name: &'static str,
-    pub symbol: &'static str,
-    pub description: &'static str,
-    pub atomic_data: AtomicData,
-    pub state_data: StateData,
-    pub electron_data: ElectronData,
-}
+fn parse_suborbital(s: &str) -> Box<dyn orbital::SubOrbital> {
+    let mut chars = s.char_indices();
 
-#[derive(Copy, Clone, Debug, PartialEq, PartialOrd)]
-pub struct AtomicData {
-    pub atomic_number: u8,
-    pub nucleon_number: u16,
-    pub atomic_mass: f64,
-}
+    let mut orbital_number = None;
+    let mut suborbital_letter = None;
+    let mut suborbital_fullness = 0;
+    
+    while let Some((idx, c)) = chars.next() {
+        if c.is_digit(10) && suborbital_letter.is_none() {
+            orbital_number = Some(c);
+        } else if c.is_alphabetic() {
+            suborbital_letter = Some(c);
+        } else if c.is_digit(10) {
+            suborbital_fullness *= 10;
+            suborbital_fullness += c.to_digit(10).unwrap();
+        }
+    }
 
-#[derive(Copy, Clone, Debug, PartialEq, PartialOrd)]
-pub struct StateData {
-    pub boiling_point: Option<f64>,
-    pub melting_point: Option<f64>,
+    if let (Some(number), Some(letter), Some(quantity)) = (orbital_number, suborbital_letter, suborbital_fullness) {
+        match letter {
+            's' => Box::new(orbital::SOrbital(quantity, number)),
+            'p' => Box::new(orbital::POrbital(quantity, number)),
+            'd' => Box::new(orbital::DOrbital(quantity, number)),
+            'f' => Box::new(orbital::FOrbital(quantity, number)),
+            _ => panic!("Invalid suborbital letter")
+        }
+    } else {
+        panic!("Error occured");
+    }
 }
-
-#[derive(Clone, Debug, PartialEq, PartialOrd)]
-pub struct ElectronData {
-    pub electron_configuration: ElectronConfiguration,
-    pub ionisation_energies: Vec<f64>,
-}
-
-#[derive(Copy, Clone, Debug, PartialEq, PartialOrd)]
-pub struct ElectronConfiguration {}

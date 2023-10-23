@@ -1,6 +1,7 @@
+use std::cmp::PartialEq;
+
 use super::element::Element;
 
-use std::cmp::PartialEq;
 
 impl PartialEq for Element {
     fn eq(&self, other: &Self) -> bool {
