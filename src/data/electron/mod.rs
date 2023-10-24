@@ -1,6 +1,5 @@
 pub mod orbital;
 
-
 use quote::quote;
 use staticvec::StaticVec;
 
@@ -12,7 +11,6 @@ pub struct ElectronData {
 
 #[derive(Clone, Debug, PartialEq, PartialOrd)]
 pub struct ElectronConfiguration(StaticVec<Orbital>);
-
 
 impl ToTokens for ElectronData {
     fn to_tokens(&self, tokens: &mut TokenStream) {
@@ -38,10 +36,10 @@ impl ToTokens for ElectronData {
 
 impl ToTokens for ElectronConfiguration {
     fn to_tokens(&self, tokens: &mut TokenStream) {
+        let slice = slice_to_string().parse::<proc_macro2::TokenStream>().unwrap();
+
         let add_tokens = quote! {
-            chemistru_elements::data::ElectronConfiguration(staticvec::StaticVec::new_from_slice(&[
-                
-            ]))
+            chemistru_elements::data::ElectronConfiguration(staticvec::StaticVec::new_from_slice(&[#(#orbital),*]))
         };
     }
 }
