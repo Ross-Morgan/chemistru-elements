@@ -3,17 +3,6 @@ use bounded_integer::bounded_integer;
 #[derive(Copy, Clone, Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
 struct Orbital(SOrbital, POrbital, DOrbital, FOrbital);
 
-
-pub trait SubOrbital {
-    pub const CAPACITY: u8;
-
-    pub fn electrons(&self) -> u8;
-
-    pub fn electron_capcacity_pair(&self) -> (u8, u8) {
-        (Self::electrons(&self), Self::CAPACITY)
-    }
-}
-
 #[derive(Copy, Clone, Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct SOrbital(u8, u8);
 #[derive(Copy, Clone, Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
@@ -23,62 +12,39 @@ pub struct DOrbital(u8, u8);
 #[derive(Copy, Clone, Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct FOrbital(u8, u8);
 
-impl SOrbital {
-    pub const fn new(capcaity: u8, fullness: u8) -> Self {
-        assert!(capcaity <= Self::CAPACITY);
-        Self(capacity, fullness)
-    }
+pub trait SubOrbital {
+    pub const CAPACITY: u8;
 
-    pub const fn into_inner(self) -> u8 { self.0 }
+    pub fn orbital_number(&self) -> u8;
+    pub fn electrons(&self) -> u8;
 }
 
-impl POrbital {
-    pub const fn new(capcaity: u8, fullness: u8) -> Self {
-        assert!(capcaity <= Self::CAPACITY);
-        Self(capacity, fullness)
-    }
+macro_rules! impl_suborbital_block {
+    ($($t:ty, $cap:literal, $block_letter:literal),+ $(,)?) => {
+        $(
+            impl SubOrbital for $ty {
+                const CAPACITY: u8 = $cap;
 
-    pub const fn into_inner(self) -> u8 { self.0 }
+                fn orbital_number(&self) -> u8 { self.0 }
+                fn electrons(&self) -> u8 { self.1 }
+            }
+
+            impl $ty {
+                pub const fn new(number: u8, fullness: u8) -> Self {
+                    match fullness {
+                        0..Self::CAPACITY => Self(number, fullness),
+                        _ => panic!("Specified more than {} electrons in a {} suborbital", Self::CAPACITY, $block_letter)
+                    }
+                }
+            }
+        )*
+    };
 }
 
-impl DOrbital {
-    pub const fn new(capcaity: u8, fullness: u8) -> Self {
-        assert!(capcaity <= Self::CAPACITY);
-        Self(capacity, fullness)
-    }
 
-    pub const fn into_inner(self) -> u8 { self.0 }
-}
-
-impl FOrbital {
-    pub const fn new(capcaity: u8, fullness: u8) -> Self {
-        assert!(capcaity <= Self::CAPACITY);
-        Self(capacity, fullness)
-    }
-
-    pub const fn into_inner(self) -> u8 { self.0 }
-}
-
-impl SubOrbital for SOrbital {
-    const CAPACITY: u8 = 2;
-
-    fn electrons(&self) -> u8 { self.0 }
-}
-
-impl SubOrbital for POrbital {
-    const CAPACITY: u8 = 6;
-
-    fn electrons(&self) -> u8 { self.0 }
-}
-
-impl SubOrbital for DOrbital {
-    const CAPACITY: u8 = 10;
-
-    fn electrons(&self) -> u8 { self.0 }
-}
-
-impl SubOrbital for FOrbital {
-    const CAPACITY: u8 = 14;
-
-    fn electrons(&self) -> u8 { self.0 }
+impl_suborbital_block! {
+    SBlock, 2,  's',
+    PBlock, 6,  'p',
+    DBlock, 10, 'd',
+    FBlock, 14, 'f',
 }
