@@ -1,3 +1,6 @@
+use proc_macro2::{TokenStream, TokenTree, Group, Delimiter};
+use quote::{quote, ToTokens, TokenStreamExt};
+
 use super::data::prelude::*;
 
 /// Detailed information about an element
@@ -33,5 +36,7 @@ impl ToTokens for InnerElement {
                 electron_data: #electron_data,
             }
         };
+
+        stream.append(TokenTree::Group(Group::new(Delimiter::Brace, tokens)));
     }
 }
