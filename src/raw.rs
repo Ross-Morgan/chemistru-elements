@@ -70,7 +70,7 @@ fn parse_suborbital(s: &str) -> Box<dyn orbital::SubOrbital> {
 
     let mut orbital_number = None;
     let mut suborbital_letter = None;
-    let mut suborbital_fullness = 0;
+    let mut suborbital_fullness = 0u8;
     
     while let Some((idx, c)) = chars.next() {
         if c.is_digit(10) && suborbital_letter.is_none() {
@@ -92,6 +92,6 @@ fn parse_suborbital(s: &str) -> Box<dyn orbital::SubOrbital> {
             _ => panic!("Invalid suborbital letter")
         }
     } else {
-        panic!("Error occured");
+        panic!("Invalid orbital number, suborbital letter, or electron quantity");
     }
 }
