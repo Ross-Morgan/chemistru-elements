@@ -1,9 +1,7 @@
-use proc_macro2::{TokenStream, Group, Delimiter, TokenTree};
-use quote::{TokenStreamExt, ToTokens, quote};
 use serde::{Deserialize, Serialize};
-use staticvec::StaticVec;
 
 use crate::data::electron::orbital;
+use crate::inner::InnerElement;
 
 use super::data::prelude::*;
 
@@ -40,9 +38,23 @@ pub struct RawElement {
 
 impl RawElement {
     pub fn into_inner(self) -> InnerElement {
-        let electron_configuration = self.electron_configuration
-            .split(" ")
-            .map(parse_suborbital);
+        let sub_orbitals = self.electron_configuration.split(" ").map(parse_suborbital).collect::<Vec<_>>();
+
+        let mut electron_configuration = [1u8, 2, 3, 4, 5, 6]
+            .map(|i| Orbital(
+                SOrbital(i, 0),
+                POrbital(i, 0),
+                DOrbital(i, 0),
+                FOrbital(i, 0),
+            ));
+
+        sub_orbitals.iter().for_each(|so| match so.capacity() {
+            2  => electron_configuration[so.orbital_number() as usize -  1].0.1 = so.electrons(),
+            6  => electron_configuration[so.orbital_number() as usize -  1].1.1 = so.electrons(),
+            10 => electron_configuration[so.orbital_number() as usize -  1].2.1 = so.electrons(),
+            14 => electron_configuration[so.orbital_number() as usize -  1].3.1 = so.electrons(),
+            cap => panic!("Invalid suborbital capacity [{cap}]"),
+        });
 
         InnerElement {
             name: self.name,
@@ -59,36 +71,36 @@ impl RawElement {
             },
             electron_data: ElectronData {
                 electron_configuration: ElectronConfiguration(electron_configuration),
-                ionisation_energies: StaticVec::new_from_slice(self.ionization_energies.as_slice()),
+                ionisation_energies: self.ionization_energies.try_into().unwrap(),
             },
         }
     }
 }
 
 fn parse_suborbital(s: &str) -> Box<dyn orbital::SubOrbital> {
-    let mut chars = s.char_indices();
+    let mut chars = s.chars();
 
     let mut orbital_number = None;
     let mut suborbital_letter = None;
     let mut suborbital_fullness = 0u8;
     
-    while let Some((idx, c)) = chars.next() {
+    while let Some(c) = chars.next() {
         if c.is_digit(10) && suborbital_letter.is_none() {
             orbital_number = Some(c);
         } else if c.is_alphabetic() {
             suborbital_letter = Some(c);
         } else if c.is_digit(10) {
             suborbital_fullness *= 10;
-            suborbital_fullness += c.to_digit(10).unwrap();
+            suborbital_fullness += c.to_digit(10).unwrap() as u8;
         }
     }
 
-    if let (Some(number), Some(letter), Some(quantity)) = (orbital_number, suborbital_letter, suborbital_fullness) {
+    if let (Some(number), Some(letter), quantity) = (orbital_number, suborbital_letter, suborbital_fullness) {
         match letter {
-            's' => Box::new(orbital::SOrbital(quantity, number)),
-            'p' => Box::new(orbital::POrbital(quantity, number)),
-            'd' => Box::new(orbital::DOrbital(quantity, number)),
-            'f' => Box::new(orbital::FOrbital(quantity, number)),
+            's' => Box::new(orbital::SOrbital(quantity, number.to_digit(10).unwrap() as u8)),
+            'p' => Box::new(orbital::POrbital(quantity, number.to_digit(10).unwrap() as u8)),
+            'd' => Box::new(orbital::DOrbital(quantity, number.to_digit(10).unwrap() as u8)),
+            'f' => Box::new(orbital::FOrbital(quantity, number.to_digit(10).unwrap() as u8)),
             _ => panic!("Invalid suborbital letter")
         }
     } else {
