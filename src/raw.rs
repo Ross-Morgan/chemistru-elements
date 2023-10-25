@@ -27,7 +27,7 @@ pub struct RawElement {
     pub symbol: &'static str,
     pub xpos: u8,
     pub ypos: u8,
-    pub shells: &'static [u8],
+    pub shells: Vec<u8>,
     pub electron_configuration: &'static str,
     pub electron_configuration_semantic: &'static str,
     pub electron_affinity: Option<f64>,
@@ -56,6 +56,24 @@ impl RawElement {
             cap => panic!("Invalid suborbital capacity [{cap}]"),
         });
 
+        let electron_configuration = ElectronConfiguration(electron_configuration);
+
+        let mut ionisation_energies = [0.0f64; 30];
+
+        let s = ionisation_energies.as_mut_slice();
+
+        for (idx, &item) in self.ionization_energies.iter().enumerate() {
+            s[idx] = item;
+        }
+
+        let mut shells = [0u8; 8];
+
+        let s = shells.as_mut_slice();
+
+        for (idx, &item) in self.shells.iter().enumerate() {
+            s[idx] = item;
+        }
+
         InnerElement {
             name: self.name,
             symbol: self.symbol,
@@ -70,8 +88,11 @@ impl RawElement {
                 melting_point: self.melt,
             },
             electron_data: ElectronData {
-                electron_configuration: ElectronConfiguration(electron_configuration),
-                ionisation_energies: self.ionization_energies.try_into().unwrap(),
+                electron_configuration,
+                ionisation_energies,
+                shells,
+                electron_affinity: self.electron_affinity,
+                electronegativity: self.electronegativity_pauling,
             },
         }
     }
