@@ -1,5 +1,8 @@
 use super::data::prelude::*;
 
+/// Detailed information about an element
+/// 
+/// Should be held behind avstatic reference where possible
 #[derive(Clone, Debug, PartialEq, PartialOrd)]
 pub struct InnerElement {
     pub name: &'static str,
