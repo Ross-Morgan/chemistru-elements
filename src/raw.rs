@@ -23,7 +23,7 @@ pub struct RawElement {
     pub phase: &'static str,
     pub source: &'static str,
     pub spectral_img: Option<&'static str>,
-    pub summary: &'static str,
+    pub summary: String,
     pub symbol: &'static str,
     pub xpos: u8,
     pub ypos: u8,
@@ -77,7 +77,7 @@ impl RawElement {
         InnerElement {
             name: self.name,
             symbol: self.symbol,
-            description: self.summary,
+            description: Box::leak(self.summary.into_boxed_str()),
             atomic_data: AtomicData {
                 atomic_number: self.number,
                 nucleon_number: self.atomic_mass.round() as u16,
@@ -98,7 +98,7 @@ impl RawElement {
     }
 }
 
-fn parse_suborbital(s: &str) -> Box<dyn orbital::SubOrbital> {
+pub fn parse_suborbital(s: &str) -> Box<dyn orbital::SubOrbital> {
     let mut chars = s.chars();
 
     let mut orbital_number = None;
@@ -118,10 +118,10 @@ fn parse_suborbital(s: &str) -> Box<dyn orbital::SubOrbital> {
 
     if let (Some(number), Some(letter), quantity) = (orbital_number, suborbital_letter, suborbital_fullness) {
         match letter {
-            's' => Box::new(orbital::SOrbital(quantity, number.to_digit(10).unwrap() as u8)),
-            'p' => Box::new(orbital::POrbital(quantity, number.to_digit(10).unwrap() as u8)),
-            'd' => Box::new(orbital::DOrbital(quantity, number.to_digit(10).unwrap() as u8)),
-            'f' => Box::new(orbital::FOrbital(quantity, number.to_digit(10).unwrap() as u8)),
+            's' => Box::new(orbital::SOrbital(number.to_digit(10).unwrap() as u8, quantity)),
+            'p' => Box::new(orbital::POrbital(number.to_digit(10).unwrap() as u8, quantity)),
+            'd' => Box::new(orbital::DOrbital(number.to_digit(10).unwrap() as u8, quantity)),
+            'f' => Box::new(orbital::FOrbital(number.to_digit(10).unwrap() as u8, quantity)),
             _ => panic!("Invalid suborbital letter")
         }
     } else {
