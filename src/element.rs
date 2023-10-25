@@ -1,5 +1,6 @@
 use crate::raw::InnerElement;
 
+/// Small-ish Representation of an Element
 #[derive(Copy, Debug, Clone)]
 pub struct Element {
     name: &'static str,

@@ -1,17 +1,20 @@
-use bounded_integer::bounded_integer;
-
+/// An electron orbital, containing an S, P, D, and F block
 #[derive(Copy, Clone, Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
 struct Orbital(SOrbital, POrbital, DOrbital, FOrbital);
 
 #[derive(Copy, Clone, Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct SOrbital(u8, u8);
+
 #[derive(Copy, Clone, Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct POrbital(u8, u8);
+
 #[derive(Copy, Clone, Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct DOrbital(u8, u8);
+
 #[derive(Copy, Clone, Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct FOrbital(u8, u8);
 
+/// 
 pub trait SubOrbital {
     pub const CAPACITY: u8;
 

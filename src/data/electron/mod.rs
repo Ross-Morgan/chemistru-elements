@@ -9,8 +9,9 @@ pub struct ElectronData {
     pub ionisation_energies: StaticVec<f64, 30>,
 }
 
+/// Representation of electron configuration using StaticVec
 #[derive(Clone, Debug, PartialEq, PartialOrd)]
-pub struct ElectronConfiguration(StaticVec<Orbital>);
+pub struct ElectronConfiguration(StaticVec<orbital::Orbital, 6>);
 
 impl ToTokens for ElectronData {
     fn to_tokens(&self, tokens: &mut TokenStream) {
