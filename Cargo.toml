@@ -19,4 +19,3 @@ phf = "0.11.2"
 proc-macro2 = "1.0.69"
 quote = "1.0.33"
 serde = { version = "1.0.188", features = ["derive"] }
-staticvec = "0.11.9"
