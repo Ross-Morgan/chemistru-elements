@@ -1,3 +1,6 @@
+use proc_macro2::{Delimiter, Group, TokenStream, TokenTree};
+use quote::{quote, TokenStreamExt, ToTokens};
+
 #[derive(Copy, Clone, Debug, PartialEq, PartialOrd)]
 pub struct StateData {
     pub boiling_point: Option<f64>,
@@ -17,7 +20,7 @@ impl ToTokens for StateData {
             }
         };
 
-        let group = proc_macro2::TokenTree::Group(Group::new(
+        let group = TokenTree::Group(Group::new(
             Delimiter::Brace,
             add_tokens,
         ));

@@ -1,21 +1,23 @@
 pub mod orbital;
 
-use quote::quote;
-use staticvec::StaticVec;
+use proc_macro2::{Delimiter, Group, TokenStream, TokenTree};
+use quote::{quote, TokenStreamExt, ToTokens};
 
-#[derive(Clone, Debug, PartialEq, PartialOrd)]
+use orbital::Orbital;
+
+#[derive(Copy, Clone, Debug, PartialEq, PartialOrd)]
 pub struct ElectronData {
     pub electron_configuration: ElectronConfiguration,
-    pub ionisation_energies: StaticVec<f64, 30>,
+    pub ionisation_energies: [f64; 30],
 }
 
 /// Representation of electron configuration using StaticVec
-#[derive(Clone, Debug, PartialEq, PartialOrd)]
-pub struct ElectronConfiguration(StaticVec<orbital::Orbital, 6>);
+#[derive(Copy, Clone, Debug, PartialEq, PartialOrd)]
+pub struct ElectronConfiguration(pub(crate) [Orbital; 6]);
 
 impl ToTokens for ElectronData {
     fn to_tokens(&self, tokens: &mut TokenStream) {
-        let electron_configuration = self.electron_configuration;
+        let electron_configuration = &self.electron_configuration;
         let ionisation_energies = self.ionisation_energies.iter();
 
         let add_tokens = quote! {
@@ -37,10 +39,12 @@ impl ToTokens for ElectronData {
 
 impl ToTokens for ElectronConfiguration {
     fn to_tokens(&self, tokens: &mut TokenStream) {
-        let slice = slice_to_string().parse::<proc_macro2::TokenStream>().unwrap();
+        let orbitals = self.0;
 
         let add_tokens = quote! {
-            chemistru_elements::data::ElectronConfiguration(staticvec::StaticVec::new_from_slice(&[#(#orbital),*]))
+            chemistru_elements::data::ElectronConfiguration([#(#orbitals),*])
         };
+
+        tokens.append(TokenTree::Group(Group::new(Delimiter::Brace, add_tokens)));
     }
 }
