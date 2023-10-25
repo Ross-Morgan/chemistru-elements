@@ -1,3 +1,6 @@
+use proc_macro2::{Delimiter, Group, TokenStream};
+use quote::{quote, TokenStreamExt, ToTokens};
+
 #[derive(Copy, Clone, Debug, PartialEq, PartialOrd)]
 pub struct AtomicData {
     pub atomic_number: u8,
