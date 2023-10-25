@@ -16,7 +16,7 @@ pub struct ElectronData {
 
 /// Representation of electron configuration using StaticVec
 #[derive(Copy, Clone, Debug, PartialEq, PartialOrd)]
-pub struct ElectronConfiguration(pub(crate) [Orbital; 6]);
+pub struct ElectronConfiguration(pub(crate) [Orbital; 8]);
 
 impl ToTokens for ElectronData {
     fn to_tokens(&self, tokens: &mut TokenStream) {

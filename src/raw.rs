@@ -40,7 +40,7 @@ impl RawElement {
     pub fn into_inner(self) -> InnerElement {
         let sub_orbitals = self.electron_configuration.split(" ").map(parse_suborbital).collect::<Vec<_>>();
 
-        let mut electron_configuration = [1u8, 2, 3, 4, 5, 6]
+        let mut electron_configuration = [1u8, 2, 3, 4, 5, 6, 7, 8]
             .map(|i| Orbital(
                 SOrbital(i, 0),
                 POrbital(i, 0),
