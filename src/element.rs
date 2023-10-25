@@ -1,4 +1,4 @@
-use crate::raw::InnerElement;
+use crate::inner::InnerElement;
 
 /// Small-ish Representation of an Element
 #[derive(Copy, Debug, Clone)]
