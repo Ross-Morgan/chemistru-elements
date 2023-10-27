@@ -9,8 +9,15 @@ pub struct StateData {
 
 impl ToTokens for StateData {
     fn to_tokens(&self, tokens: &mut TokenStream) {
-        let melting_point = self.melting_point.unwrap_or(0.0);
-        let boiling_point = self.boiling_point.unwrap_or(0.0);
+        let melting_point = match self.melting_point {
+            Some(f) => quote!(Some(#f)),
+            None => quote!(None),
+        };
+
+        let boiling_point = match self.boiling_point {
+            Some(f) => quote!(Some(#f)),
+            None => quote!(None),
+        };
 
         let add_tokens = quote! {
             chemistru_elements::data::state::StateData {
