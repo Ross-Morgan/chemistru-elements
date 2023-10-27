@@ -29,7 +29,7 @@ impl ToTokens for ElectronData {
         let electronegativity = self.electronegativity;
 
         let add_tokens = quote! {
-            chemistru_elements::raw::ElectronData {
+            chemistru_elements::data::electron::ElectronData {
                 electron_configuration: #electron_configuration,
                 ionisation_energies: #ionisation_energies,
                 shells: #shells,

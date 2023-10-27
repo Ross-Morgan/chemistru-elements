@@ -15,7 +15,7 @@ impl ToTokens for AtomicData {
         let atomic_mass = self.atomic_mass;
 
         let add_tokens = quote! {
-            chemistru_elements::raw::AtomicData {
+            chemistru_elements::data::atomic::AtomicData {
                 atomic_number: #atomic_number,
                 nucleon_number: #nucleon_number,
                 atomic_mass: #atomic_mass,
