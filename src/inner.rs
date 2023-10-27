@@ -5,7 +5,9 @@ use super::data::prelude::*;
 
 /// Detailed information about an element
 /// 
-/// Should be held behind avstatic reference where possible
+/// Should be held behind avstatic reference where possible due to large size
+/// 
+/// Large size is due to being made able to be static or constant
 #[derive(Clone, Debug, PartialEq, PartialOrd)]
 pub struct InnerElement {
     pub name: &'static str,
