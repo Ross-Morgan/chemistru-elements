@@ -39,7 +39,7 @@ impl ToTokens for ElectronData {
         };
 
         let group = TokenTree::Group(Group::new(
-            Delimiter::Brace,
+            Delimiter::None,
             add_tokens,
         ));
 
@@ -53,10 +53,10 @@ impl ToTokens for ElectronConfiguration {
         let orbitals = self.0;
 
         let add_tokens = quote! {
-            chemistru_elements::data::ElectronConfiguration([#(#orbitals),*])
+            chemistru_elements::data::electron::ElectronConfiguration([#(#orbitals),*])
         };
 
-        tokens.append(TokenTree::Group(Group::new(Delimiter::Brace, add_tokens)));
+        tokens.append(TokenTree::Group(Group::new(Delimiter::None, add_tokens)));
     }
 }
 
