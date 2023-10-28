@@ -90,7 +90,7 @@ impl ToTokens for Orbital {
         let f = self.3.1;
 
         let add_tokens = quote! {
-            chemistru_elements::data::electron::Orbital(
+            chemistru_elements::data::electron::orbital::Orbital(
                 chemistru_elements::data::electron::orbital::SOrbital(#orbital_number, #s),
                 chemistru_elements::data::electron::orbital::POrbital(#orbital_number, #p),
                 chemistru_elements::data::electron::orbital::DOrbital(#orbital_number, #d),
