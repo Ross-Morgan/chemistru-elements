@@ -29,7 +29,7 @@ impl ToTokens for InnerElement {
         let electron_data = self.electron_data;
 
         let tokens = quote! {
-            &'static chemistru_elements::inner::InnerElement {
+            &chemistru_elements::inner::InnerElement {
                 name: #name,
                 symbol: #symbol,
                 description: #desc,
