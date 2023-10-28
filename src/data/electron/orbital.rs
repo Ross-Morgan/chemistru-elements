@@ -98,7 +98,7 @@ impl ToTokens for Orbital {
             )
         };
 
-        tokens.append(TokenTree::Group(Group::new(Delimiter::Brace, add_tokens)));
+        tokens.append(TokenTree::Group(Group::new(Delimiter::None, add_tokens)));
     }
 }
 

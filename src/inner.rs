@@ -29,7 +29,7 @@ impl ToTokens for InnerElement {
         let electron_data = self.electron_data;
 
         let tokens = quote! {
-            chemistru_elements::inner::InnerElement {
+            &'static chemistru_elements::inner::InnerElement {
                 name: #name,
                 symbol: #symbol,
                 description: #desc,
@@ -39,6 +39,6 @@ impl ToTokens for InnerElement {
             }
         };
 
-        stream.append(TokenTree::Group(Group::new(Delimiter::Brace, tokens)));
+        stream.append(TokenTree::Group(Group::new(Delimiter::None, tokens)));
     }
 }
