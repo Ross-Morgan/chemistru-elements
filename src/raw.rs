@@ -84,8 +84,8 @@ impl RawElement {
                 atomic_mass: self.atomic_mass,
             },
             state_data: StateData {
-                boiling_point: self.boil,
-                melting_point: self.melt,
+                boiling_point: self.boil.unwrap_or(0.0),
+                melting_point: self.melt.unwrap_or(0.0),
             },
             electron_data: ElectronData {
                 electron_configuration,

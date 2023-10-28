@@ -3,8 +3,11 @@ use quote::{quote, TokenStreamExt, ToTokens};
 
 #[derive(Copy, Clone, Debug, PartialEq, PartialOrd)]
 pub struct AtomicData {
+    /// Number of protons
     pub atomic_number: u8,
+    /// Number of nucleons (protons and neutrons)
     pub nucleon_number: u16,
+    /// Atomic mass
     pub atomic_mass: f64,
 }
 
@@ -23,7 +26,7 @@ impl ToTokens for AtomicData {
         };
 
         let group = proc_macro2::TokenTree::Group(Group::new(
-            Delimiter::Brace,
+            Delimiter::None,
             add_tokens,
         ));
 
