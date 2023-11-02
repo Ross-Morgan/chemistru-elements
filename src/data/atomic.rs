@@ -1,5 +1,5 @@
 use proc_macro2::{Delimiter, Group, TokenStream};
-use quote::{quote, TokenStreamExt, ToTokens};
+use quote::{quote, ToTokens, TokenStreamExt};
 
 #[derive(Copy, Clone, Debug, PartialEq, PartialOrd)]
 pub struct AtomicData {
@@ -25,10 +25,7 @@ impl ToTokens for AtomicData {
             }
         };
 
-        let group = proc_macro2::TokenTree::Group(Group::new(
-            Delimiter::None,
-            add_tokens,
-        ));
+        let group = proc_macro2::TokenTree::Group(Group::new(Delimiter::None, add_tokens));
 
         tokens.append(group);
     }

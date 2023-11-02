@@ -1,12 +1,12 @@
-use proc_macro2::{TokenStream, TokenTree, Group, Delimiter};
+use proc_macro2::{Delimiter, Group, TokenStream, TokenTree};
 use quote::{quote, ToTokens, TokenStreamExt};
 
 use super::data::prelude::*;
 
 /// Detailed information about an element
-/// 
+///
 /// Should be held behind avstatic reference where possible due to large size
-/// 
+///
 /// Large size is due to being made able to be static or constant
 #[derive(Clone, Debug, PartialEq, PartialOrd)]
 pub struct InnerElement {
@@ -17,7 +17,6 @@ pub struct InnerElement {
     pub state_data: StateData,
     pub electron_data: ElectronData,
 }
-
 
 impl ToTokens for InnerElement {
     fn to_tokens(&self, stream: &mut TokenStream) {

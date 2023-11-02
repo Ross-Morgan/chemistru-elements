@@ -1,7 +1,7 @@
 pub mod orbital;
 
 use proc_macro2::{Delimiter, Group, TokenStream, TokenTree};
-use quote::{quote, TokenStreamExt, ToTokens};
+use quote::{quote, ToTokens, TokenStreamExt};
 
 use orbital::Orbital;
 
@@ -25,8 +25,15 @@ impl ToTokens for ElectronData {
 
         let ionisation_energies = slice_to_tokens(ionisation_energies);
         let shells = slice_to_tokens(self.shells);
-        let electron_affinity = self.electron_affinity;
-        let electronegativity = self.electronegativity;
+        let electron_affinity = match self.electron_affinity {
+            Some(v) => quote!(Some(#v)),
+            None => quote!(None),
+        };
+
+        let electronegativity = match self.electronegativity {
+            Some(v) => quote!(Some(#v)),
+            None => quote!(None),
+        };
 
         let add_tokens = quote! {
             chemistru_elements::data::electron::ElectronData {
@@ -38,15 +45,11 @@ impl ToTokens for ElectronData {
             }
         };
 
-        let group = TokenTree::Group(Group::new(
-            Delimiter::None,
-            add_tokens,
-        ));
+        let group = TokenTree::Group(Group::new(Delimiter::None, add_tokens));
 
         tokens.append(group);
     }
 }
-
 
 impl ToTokens for ElectronConfiguration {
     fn to_tokens(&self, tokens: &mut TokenStream) {
@@ -60,8 +63,7 @@ impl ToTokens for ElectronConfiguration {
     }
 }
 
-
-fn slice_to_tokens<T: ToTokens, const N: usize> (s: [T; N]) -> TokenStream {
+fn slice_to_tokens<T: ToTokens, const N: usize>(s: [T; N]) -> TokenStream {
     let item = s.iter();
 
     quote!([#(#item),*])

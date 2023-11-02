@@ -38,21 +38,42 @@ pub struct RawElement {
 
 impl RawElement {
     pub fn into_inner(self) -> InnerElement {
-        let sub_orbitals = self.electron_configuration.split(" ").map(parse_suborbital).collect::<Vec<_>>();
+        let sub_orbitals = self
+            .electron_configuration
+            .split(" ")
+            .map(parse_suborbital)
+            .collect::<Vec<_>>();
 
-        let mut electron_configuration = [1u8, 2, 3, 4, 5, 6, 7, 8]
-            .map(|i| Orbital(
+        let mut electron_configuration = [1u8, 2, 3, 4, 5, 6, 7, 8].map(|i| {
+            Orbital(
                 SOrbital(i, 0),
                 POrbital(i, 0),
                 DOrbital(i, 0),
                 FOrbital(i, 0),
-            ));
+            )
+        });
 
         sub_orbitals.iter().for_each(|so| match so.capacity() {
-            2  => electron_configuration[so.orbital_number() as usize -  1].0.1 = so.electrons(),
-            6  => electron_configuration[so.orbital_number() as usize -  1].1.1 = so.electrons(),
-            10 => electron_configuration[so.orbital_number() as usize -  1].2.1 = so.electrons(),
-            14 => electron_configuration[so.orbital_number() as usize -  1].3.1 = so.electrons(),
+            2 => {
+                electron_configuration[so.orbital_number() as usize - 1]
+                    .0
+                     .1 = so.electrons()
+            }
+            6 => {
+                electron_configuration[so.orbital_number() as usize - 1]
+                    .1
+                     .1 = so.electrons()
+            }
+            10 => {
+                electron_configuration[so.orbital_number() as usize - 1]
+                    .2
+                     .1 = so.electrons()
+            }
+            14 => {
+                electron_configuration[so.orbital_number() as usize - 1]
+                    .3
+                     .1 = so.electrons()
+            }
             cap => panic!("Invalid suborbital capacity [{cap}]"),
         });
 
@@ -84,8 +105,8 @@ impl RawElement {
                 atomic_mass: self.atomic_mass,
             },
             state_data: StateData {
-                boiling_point: self.boil.unwrap_or(0.0),
-                melting_point: self.melt.unwrap_or(0.0),
+                boiling_point: self.boil,
+                melting_point: self.melt,
             },
             electron_data: ElectronData {
                 electron_configuration,
@@ -104,7 +125,7 @@ pub fn parse_suborbital(s: &str) -> Box<dyn orbital::SubOrbital> {
     let mut orbital_number = None;
     let mut suborbital_letter = None;
     let mut suborbital_fullness = 0u8;
-    
+
     while let Some(c) = chars.next() {
         if c.is_digit(10) && suborbital_letter.is_none() {
             orbital_number = Some(c);
@@ -116,13 +137,27 @@ pub fn parse_suborbital(s: &str) -> Box<dyn orbital::SubOrbital> {
         }
     }
 
-    if let (Some(number), Some(letter), quantity) = (orbital_number, suborbital_letter, suborbital_fullness) {
+    if let (Some(number), Some(letter), quantity) =
+        (orbital_number, suborbital_letter, suborbital_fullness)
+    {
         match letter {
-            's' => Box::new(orbital::SOrbital(number.to_digit(10).unwrap() as u8, quantity)),
-            'p' => Box::new(orbital::POrbital(number.to_digit(10).unwrap() as u8, quantity)),
-            'd' => Box::new(orbital::DOrbital(number.to_digit(10).unwrap() as u8, quantity)),
-            'f' => Box::new(orbital::FOrbital(number.to_digit(10).unwrap() as u8, quantity)),
-            _ => panic!("Invalid suborbital letter")
+            's' => Box::new(orbital::SOrbital(
+                number.to_digit(10).unwrap() as u8,
+                quantity,
+            )),
+            'p' => Box::new(orbital::POrbital(
+                number.to_digit(10).unwrap() as u8,
+                quantity,
+            )),
+            'd' => Box::new(orbital::DOrbital(
+                number.to_digit(10).unwrap() as u8,
+                quantity,
+            )),
+            'f' => Box::new(orbital::FOrbital(
+                number.to_digit(10).unwrap() as u8,
+                quantity,
+            )),
+            _ => panic!("Invalid suborbital letter"),
         }
     } else {
         panic!("Invalid orbital number, suborbital letter, or electron quantity");

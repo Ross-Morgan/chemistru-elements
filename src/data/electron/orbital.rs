@@ -1,30 +1,30 @@
-use proc_macro2::{TokenTree, Group, Delimiter};
-use quote::{ToTokens, quote, TokenStreamExt};
+use proc_macro2::{Delimiter, Group, TokenTree};
+use quote::{quote, ToTokens, TokenStreamExt};
 
 /// An electron orbital, containing an S, P, D, and F block
 #[derive(Copy, Clone, Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Orbital(pub SOrbital, pub POrbital, pub DOrbital, pub FOrbital);
 
 /// Suborbital containing up to 2 electrons
-/// 
-/// S-block elements are in groups 1 and 2 
+///
+/// S-block elements are in groups 1 and 2
 #[derive(Copy, Clone, Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct SOrbital(pub u8, pub u8);
 
 /// Suborbital containing up to 6 electrons
-/// 
+///
 /// P-block elements are in groups 13-18
 #[derive(Copy, Clone, Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct POrbital(pub u8, pub u8);
 
 /// Suborbital containing up to 10 electrons
-/// 
+///
 /// D-block elements are the transition metals (groups 3-12)
 #[derive(Copy, Clone, Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct DOrbital(pub u8, pub u8);
 
 /// Suborbital containing up to 14 electrons
-/// 
+///
 /// F-block elements are the actinides and lathinides
 #[derive(Copy, Clone, Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct FOrbital(pub u8, pub u8);
@@ -40,7 +40,7 @@ pub trait SubOrbital {
 }
 
 /// Supertrait of SubOrbital with associated capacity constant
-/// 
+///
 /// Supertrait exists so that an associated constant can be defined while
 /// allowing the subtrait to be converted into a &dyn Object
 pub trait CapSubOrbital: SubOrbital {
@@ -72,7 +72,6 @@ macro_rules! impl_suborbital_block {
     };
 }
 
-
 impl_suborbital_block! {
     SOrbital, 2,  's',
     POrbital, 6,  'p',
@@ -82,19 +81,19 @@ impl_suborbital_block! {
 
 impl ToTokens for Orbital {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
-        let orbital_number = self.0.0;
+        let orbital_number = self.0 .0;
 
-        let s = self.0.1;
-        let p = self.1.1;
-        let d = self.2.1;
-        let f = self.3.1;
+        let s = self.0 .1;
+        let p = self.1 .1;
+        let d = self.2 .1;
+        let f = self.3 .1;
 
         let add_tokens = quote! {
             chemistru_elements::data::electron::orbital::Orbital(
                 chemistru_elements::data::electron::orbital::SOrbital(#orbital_number, #s),
                 chemistru_elements::data::electron::orbital::POrbital(#orbital_number, #p),
                 chemistru_elements::data::electron::orbital::DOrbital(#orbital_number, #d),
-                chemistru_elements::data::electron::orbital::DOrbital(#orbital_number, #f),
+                chemistru_elements::data::electron::orbital::FOrbital(#orbital_number, #f),
             )
         };
 
