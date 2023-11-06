@@ -1,9 +1,11 @@
+use std::ops::{Range, RangeInclusive};
+
 use proc_macro2::{Delimiter, Group, TokenTree};
 use quote::{quote, ToTokens, TokenStreamExt};
 
 /// An electron orbital, containing an S, P, D, and F block
 #[derive(Copy, Clone, Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub struct Orbital(pub SOrbital, pub POrbital, pub DOrbital, pub FOrbital);
+pub struct EnergyLevel(pub SOrbital, pub POrbital, pub DOrbital, pub FOrbital);
 
 /// Suborbital containing up to 2 electrons
 ///
@@ -31,8 +33,14 @@ pub struct FOrbital(pub u8, pub u8);
 
 /// Trait containing methods relating to fullness, capacity and orbital number
 pub trait SubOrbital {
-    /// Orbital number that suborbital is contained in
-    fn orbital_number(&self) -> u8;
+    /// Number of energy level
+    fn quantum_number(&self) -> u8;
+    /// Indicates which sublevel the suborbital is
+    fn angular_momentum(&self) -> u8;
+    /// The orbital the last electron is contained in
+    fn magnetic_quantum_number(&self) -> i8;
+    /// Spin of last electron in suborbital
+    fn magnetic_spin_number(&self) -> f64;
     /// Number of electrons in suborbital
     fn electrons(&self) -> u8;
     /// Maximum number of electrons in suborbital
@@ -47,13 +55,46 @@ pub trait CapSubOrbital: SubOrbital {
     const CAPACITY: u8;
 }
 
+impl EnergyLevel {
+    pub const fn quantum_number(&self) -> u8 {
+        self.0 .1
+    }
+
+    pub const fn possible_angular_momenta(&self) -> Range<u8> {
+        0..self.quantum_number()
+    }
+
+    pub const fn possible_magnetic_quantum_numbers(&self) -> RangeInclusive<i8> {
+        (-(self.quantum_number() as i8))..=(self.quantum_number() as i8)
+    }
+}
+
 macro_rules! impl_suborbital_block {
     ($($t:ty, $cap:literal, $block_letter:literal),+ $(,)?) => {
         $(
             impl SubOrbital for $t {
-                fn orbital_number(&self) -> u8 { self.0 }
+                fn quantum_number(&self) -> u8 { self.0 }
+
                 fn electrons(&self) -> u8 { self.1 }
+
                 fn capacity(&self) -> u8 { $cap }
+
+                fn angular_momentum(&self) -> u8 { match $block_letter {
+                    's' => 0,
+                    'p' => 1,
+                    'd' => 2,
+                    'f' => 3,
+                    _ => panic!("Invalid suborbital letter")
+                }}
+
+                fn magnetic_quantum_number(&self) -> i8 {
+                    (self.electrons() % (self.capacity() / 2)) as i8 - self.angular_momentum() as i8
+                }
+
+                fn magnetic_spin_number(&self) -> f64 { match self.electrons().cmp(&(self.capacity() / 2)) {
+                    std::cmp::Ordering::Less | std::cmp::Ordering::Equal => 0.5,
+                    std::cmp::Ordering::Greater => -0.5,
+                }}
             }
 
             impl CapSubOrbital for $t {
@@ -79,17 +120,16 @@ impl_suborbital_block! {
     FOrbital, 14, 'f',
 }
 
-impl ToTokens for Orbital {
+impl ToTokens for EnergyLevel {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
-        let orbital_number = self.0 .0;
-
+        let orbital_number = self.0 .1;
         let s = self.0 .1;
         let p = self.1 .1;
         let d = self.2 .1;
         let f = self.3 .1;
 
         let add_tokens = quote! {
-            chemistru_elements::data::electron::orbital::Orbital(
+            chemistru_elements::data::electron::orbital::EnergyLevel(
                 chemistru_elements::data::electron::orbital::SOrbital(#orbital_number, #s),
                 chemistru_elements::data::electron::orbital::POrbital(#orbital_number, #p),
                 chemistru_elements::data::electron::orbital::DOrbital(#orbital_number, #d),
