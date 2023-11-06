@@ -11,18 +11,22 @@ pub struct Element {
 }
 
 impl Element {
+    #[inline]
     pub fn name(&self) -> String {
         self.name.to_string()
     }
 
+    #[inline]
     pub fn symbol(&self) -> String {
         self.symbol.to_string()
     }
 
+    #[inline]
     pub const fn atomic_mass(&self) -> f64 {
         self.atomic_mass
     }
 
+    #[inline]
     pub const fn atomic_number(&self) -> u8 {
         self.atomic_number
     }
@@ -31,6 +35,7 @@ impl Element {
         self.raw
     }
 
+    #[inline]
     pub const fn new(
         name: &'static str,
         symbol: &'static str,
@@ -45,5 +50,35 @@ impl Element {
             atomic_number,
             raw,
         }
+    }
+}
+
+pub trait Elemental {
+    fn name(&self) -> String;
+    fn symbol(&self) -> String;
+    fn atomic_mass(&self) -> f64;
+    fn atomic_number(&self) -> u8;
+    fn data(&self) -> &'static InnerElement;
+}
+
+impl Elemental for Element {
+    fn name(&self) -> String {
+        self.name()
+    }
+
+    fn symbol(&self) -> String {
+        self.symbol()
+    }
+
+    fn atomic_mass(&self) -> f64 {
+        self.atomic_mass()
+    }
+
+    fn atomic_number(&self) -> u8 {
+        self.atomic_number()
+    }
+
+    fn data(&self) -> &'static InnerElement {
+        self.data()
     }
 }
