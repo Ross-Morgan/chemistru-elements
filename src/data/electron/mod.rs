@@ -3,7 +3,7 @@ pub mod orbital;
 use proc_macro2::{Delimiter, Group, TokenStream, TokenTree};
 use quote::{quote, ToTokens, TokenStreamExt};
 
-use orbital::Orbital;
+use orbital::EnergyLevel;
 
 #[derive(Copy, Clone, Debug, PartialEq, PartialOrd)]
 pub struct ElectronData {
@@ -16,7 +16,7 @@ pub struct ElectronData {
 
 /// Representation of electron configuration using StaticVec
 #[derive(Copy, Clone, Debug, PartialEq, PartialOrd)]
-pub struct ElectronConfiguration(pub [Orbital; 8]);
+pub struct ElectronConfiguration(pub [EnergyLevel; 8]);
 
 impl ToTokens for ElectronData {
     fn to_tokens(&self, tokens: &mut TokenStream) {

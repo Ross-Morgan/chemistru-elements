@@ -45,7 +45,7 @@ impl RawElement {
             .collect::<Vec<_>>();
 
         let mut electron_configuration = [1u8, 2, 3, 4, 5, 6, 7, 8].map(|i| {
-            Orbital(
+            EnergyLevel(
                 SOrbital(i, 0),
                 POrbital(i, 0),
                 DOrbital(i, 0),
@@ -55,22 +55,22 @@ impl RawElement {
 
         sub_orbitals.iter().for_each(|so| match so.capacity() {
             2 => {
-                electron_configuration[so.orbital_number() as usize - 1]
+                electron_configuration[so.quantum_number() as usize - 1]
                     .0
                      .1 = so.electrons()
             }
             6 => {
-                electron_configuration[so.orbital_number() as usize - 1]
+                electron_configuration[so.quantum_number() as usize - 1]
                     .1
                      .1 = so.electrons()
             }
             10 => {
-                electron_configuration[so.orbital_number() as usize - 1]
+                electron_configuration[so.quantum_number() as usize - 1]
                     .2
                      .1 = so.electrons()
             }
             14 => {
-                electron_configuration[so.orbital_number() as usize - 1]
+                electron_configuration[so.quantum_number() as usize - 1]
                     .3
                      .1 = so.electrons()
             }
@@ -122,13 +122,13 @@ impl RawElement {
 pub fn parse_suborbital(s: &str) -> Box<dyn orbital::SubOrbital> {
     let mut chars = s.chars();
 
-    let mut orbital_number = None;
+    let mut quantum_number = None;
     let mut suborbital_letter = None;
     let mut suborbital_fullness = 0u8;
 
     while let Some(c) = chars.next() {
         if c.is_digit(10) && suborbital_letter.is_none() {
-            orbital_number = Some(c);
+            quantum_number = Some(c);
         } else if c.is_alphabetic() {
             suborbital_letter = Some(c);
         } else if c.is_digit(10) {
@@ -138,7 +138,7 @@ pub fn parse_suborbital(s: &str) -> Box<dyn orbital::SubOrbital> {
     }
 
     if let (Some(number), Some(letter), quantity) =
-        (orbital_number, suborbital_letter, suborbital_fullness)
+        (quantum_number, suborbital_letter, suborbital_fullness)
     {
         match letter {
             's' => Box::new(orbital::SOrbital(
