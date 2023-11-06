@@ -5,31 +5,36 @@ use quote::{quote, ToTokens, TokenStreamExt};
 
 /// An electron orbital, containing an S, P, D, and F block
 #[derive(Copy, Clone, Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub struct EnergyLevel(pub SOrbital, pub POrbital, pub DOrbital, pub FOrbital);
+pub struct EnergyLevel {
+    pub s: SOrbital,
+    pub p: POrbital,
+    pub d: DOrbital,
+    pub f: FOrbital,
+}
 
 /// Suborbital containing up to 2 electrons
 ///
 /// S-block elements are in groups 1 and 2
 #[derive(Copy, Clone, Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub struct SOrbital(pub u8, pub u8);
+pub struct SOrbital(u8, u8);
 
 /// Suborbital containing up to 6 electrons
 ///
 /// P-block elements are in groups 13-18
 #[derive(Copy, Clone, Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub struct POrbital(pub u8, pub u8);
+pub struct POrbital(u8, u8);
 
 /// Suborbital containing up to 10 electrons
 ///
 /// D-block elements are the transition metals (groups 3-12)
 #[derive(Copy, Clone, Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub struct DOrbital(pub u8, pub u8);
+pub struct DOrbital(u8, u8);
 
 /// Suborbital containing up to 14 electrons
 ///
 /// F-block elements are the actinides and lathinides
 #[derive(Copy, Clone, Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub struct FOrbital(pub u8, pub u8);
+pub struct FOrbital(u8, u8);
 
 /// Trait containing methods relating to fullness, capacity and orbital number
 pub trait SubOrbital {
@@ -45,6 +50,8 @@ pub trait SubOrbital {
     fn electrons(&self) -> u8;
     /// Maximum number of electrons in suborbital
     fn capacity(&self) -> u8;
+    /// Mutable reference to electron count
+    fn electrons_as_mut(&mut self) -> &mut u8;
 }
 
 /// Supertrait of SubOrbital with associated capacity constant
@@ -53,11 +60,21 @@ pub trait SubOrbital {
 /// allowing the subtrait to be converted into a &dyn Object
 pub trait CapSubOrbital: SubOrbital {
     const CAPACITY: u8;
+    const ANGULAR_MOMENTUM: u8;
 }
 
 impl EnergyLevel {
     pub const fn quantum_number(&self) -> u8 {
-        self.0 .1
+        let s = self.s.0;
+        let p = self.p.0;
+        let d = self.d.0;
+        let f = self.f.0;
+
+        assert!(s == p);
+        assert!(s == d);
+        assert!(s == f);
+
+        s
     }
 
     pub const fn possible_angular_momenta(&self) -> Range<u8> {
@@ -91,14 +108,25 @@ macro_rules! impl_suborbital_block {
                     (self.electrons() % (self.capacity() / 2)) as i8 - self.angular_momentum() as i8
                 }
 
-                fn magnetic_spin_number(&self) -> f64 { match self.electrons().cmp(&(self.capacity() / 2)) {
-                    std::cmp::Ordering::Less | std::cmp::Ordering::Equal => 0.5,
-                    std::cmp::Ordering::Greater => -0.5,
-                }}
+                fn magnetic_spin_number(&self) -> f64 {
+                    match self.electrons().cmp(&(self.capacity() / 2)) {
+                        std::cmp::Ordering::Less | std::cmp::Ordering::Equal => 0.5,
+                        std::cmp::Ordering::Greater => -0.5,
+                    }
+                }
+
+                fn electrons_as_mut(&mut self) -> &mut u8 { &mut self.1 }
             }
 
             impl CapSubOrbital for $t {
                 const CAPACITY: u8 = $cap;
+                const ANGULAR_MOMENTUM: u8 = match $block_letter {
+                    's' => 0,
+                    'p' => 1,
+                    'd' => 2,
+                    'f' => 3,
+                    _ => panic!("Invalid suborbital letter")
+                };
             }
 
             impl $t {
@@ -108,6 +136,11 @@ macro_rules! impl_suborbital_block {
                         _ => Self(number, 0)
                     }
                 }
+
+                pub const fn is_empty(&self) -> bool {
+                    self.1 == 0
+                }
+
             }
         )*
     };
@@ -122,19 +155,19 @@ impl_suborbital_block! {
 
 impl ToTokens for EnergyLevel {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
-        let orbital_number = self.0 .1;
-        let s = self.0 .1;
-        let p = self.1 .1;
-        let d = self.2 .1;
-        let f = self.3 .1;
+        let n = self.quantum_number();
+        let s = self.s.1;
+        let p = self.p.1;
+        let d = self.d.1;
+        let f = self.f.1;
 
-        let add_tokens = quote! {
-            chemistru_elements::data::electron::orbital::EnergyLevel(
-                chemistru_elements::data::electron::orbital::SOrbital(#orbital_number, #s),
-                chemistru_elements::data::electron::orbital::POrbital(#orbital_number, #p),
-                chemistru_elements::data::electron::orbital::DOrbital(#orbital_number, #d),
-                chemistru_elements::data::electron::orbital::FOrbital(#orbital_number, #f),
-            )
+        let add_tokens: proc_macro2::TokenStream = quote! {
+            chemistru_elements::data::electron::orbital::EnergyLevel {
+                s: chemistru_elements::data::electron::orbital::SOrbital::new(#n, #s),
+                p: chemistru_elements::data::electron::orbital::POrbital::new(#n, #p),
+                d: chemistru_elements::data::electron::orbital::DOrbital::new(#n, #d),
+                f: chemistru_elements::data::electron::orbital::FOrbital::new(#n, #f),
+            }
         };
 
         tokens.append(TokenTree::Group(Group::new(Delimiter::None, add_tokens)));
@@ -144,15 +177,15 @@ impl ToTokens for EnergyLevel {
 #[macro_export]
 macro_rules! suborbital {
     (s, $number:expr, $fullness:expr) => {
-        $crate::data::electron::orbital::SOrbital($number, $fullness)
+        $crate::data::electron::orbital::SOrbital::new($number, $fullness)
     };
     (p, $number:expr, $fullness:expr) => {
-        $crate::data::electron::orbital::POrbital($number, $fullness)
+        $crate::data::electron::orbital::POrbital::new($number, $fullness)
     };
     (d, $number:expr, $fullness:expr) => {
-        $crate::data::electron::orbital::DOrbital($number, $fullness)
+        $crate::data::electron::orbital::DOrbital::new($number, $fullness)
     };
     (f, $number:expr, $fullness:expr) => {
-        $crate::data::electron::orbital::FOrbital($number, $fullness)
+        $crate::data::electron::orbital::FOrbital::new($number, $fullness)
     };
 }
