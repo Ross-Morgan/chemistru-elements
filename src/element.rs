@@ -62,22 +62,27 @@ pub trait Elemental {
 }
 
 impl Elemental for Element {
+    #[inline(always)]
     fn name(&self) -> String {
         self.name()
     }
 
+    #[inline(always)]
     fn symbol(&self) -> String {
         self.symbol()
     }
-
+    
+    #[inline(always)]
     fn atomic_mass(&self) -> f64 {
         self.atomic_mass()
     }
-
+    
+    #[inline(always)]
     fn atomic_number(&self) -> u8 {
         self.atomic_number()
     }
-
+    
+    #[inline(always)]
     fn data(&self) -> &'static InnerElement {
         self.data()
     }
