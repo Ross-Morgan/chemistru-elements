@@ -60,7 +60,7 @@ impl RawElement {
             cap => panic!("Invalid suborbital capacity [{cap}]"),
         });
 
-        let electron_configuration = ElectronConfiguration(electron_configuration);
+        let electron_configuration = ElectronConfiguration::new(electron_configuration);
 
         let mut ionisation_energies = [0.0f64; 30];
 
