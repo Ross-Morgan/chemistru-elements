@@ -1,5 +1,5 @@
 use proc_macro2::{TokenStream, TokenTree, Group, Delimiter};
-use quote::{ToTokens, TokenStreamExt,  quote};
+use quote::{ToTokens, TokenStreamExt,   quote};
 
 use crate::suborbital;
 

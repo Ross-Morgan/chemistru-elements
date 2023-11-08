@@ -48,17 +48,7 @@ impl ToTokens for ElectronData {
     }
 }
 
-impl ToTokens for ElectronConfiguration {
-    fn to_tokens(&self, tokens: &mut TokenStream) {
-        let orbitals = self.0;
 
-        let add_tokens = quote! {
-            chemistru_elements::data::electron::ElectronConfiguration([#(#orbitals),*])
-        };
-
-        tokens.append(TokenTree::Group(Group::new(Delimiter::None, add_tokens)));
-    }
-}
 
 fn slice_to_tokens<T: ToTokens, const N: usize>(s: [T; N]) -> TokenStream {
     let item = s.iter();
