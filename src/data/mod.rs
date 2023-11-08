@@ -6,6 +6,6 @@ pub mod prelude {
     use super::*;
 
     pub use atomic::AtomicData;
-    pub use electron::{orbital::*, ElectronConfiguration, ElectronData};
+    pub use electron::{orbital::*, configuration::ElectronConfiguration, ElectronData};
     pub use state::StateData;
 }
