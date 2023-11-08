@@ -129,6 +129,16 @@ macro_rules! impl_suborbital_block {
                 };
             }
 
+            impl ToString for $t {
+                fn to_string(&self) -> String {
+                    match self.electrons() {
+                        0 => String::new(),
+                        e => format!("{}{}{}", self.quantum_number(), $block_letter, e),
+                    }
+
+                }
+            }
+
             impl $t {
                 pub const fn new(number: u8, fullness: u8) -> Self {
                     match fullness {
@@ -188,4 +198,13 @@ macro_rules! suborbital {
     (f, $number:expr, $fullness:expr) => {
         $crate::data::electron::orbital::FOrbital::new($number, $fullness)
     };
+}
+
+
+impl ToString for EnergyLevel {
+    fn to_string(&self) -> String {
+        format!("{} {} {} {}", self.s.to_string(), self.p.to_string(), self.d.to_string(), self.f.to_string())
+            .trim()
+            .to_string()
+    }
 }
