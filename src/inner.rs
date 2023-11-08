@@ -8,7 +8,7 @@ use super::data::prelude::*;
 /// Should be held behind avstatic reference where possible due to large size
 ///
 /// Large size is due to being made able to be static or constant
-#[derive(Clone, Debug, PartialEq, PartialOrd)]
+#[derive(Copy, Clone, Debug, PartialEq, PartialOrd)]
 pub struct InnerElement {
     pub name: &'static str,
     pub symbol: &'static str,
