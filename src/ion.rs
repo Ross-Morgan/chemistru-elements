@@ -1,6 +1,6 @@
 use crate::{element::{Elemental, Element}, inner::InnerElement};
 
-struct Ion {
+pub struct Ion {
     pub element: Element,
     pub oxidation_state: i8,
 }
