@@ -7,5 +7,6 @@
 pub mod data;
 pub mod element;
 pub mod inner;
-pub mod ops;
+pub mod ion;
 pub mod raw;
+pub mod reaction;

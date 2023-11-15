@@ -1,7 +1,7 @@
 use crate::inner::InnerElement;
 
 /// Small-ish Representation of an Element
-#[derive(Copy, Debug, Clone)]
+#[derive(Copy, Debug, Clone, PartialOrd)]
 pub struct Element {
     name: &'static str,
     symbol: &'static str,
@@ -85,5 +85,11 @@ impl Elemental for Element {
     #[inline(always)]
     fn data(&self) -> &'static InnerElement {
         self.data()
+    }
+}
+
+impl PartialEq for Element {
+    fn eq(&self, other: &Self) -> bool {
+        (self.atomic_mass, self.atomic_number) == (other.atomic_mass, other.atomic_number)        
     }
 }
