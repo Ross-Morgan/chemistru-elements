@@ -53,10 +53,26 @@ impl RawElement {
         });
 
         sub_orbitals.iter().for_each(|so| match so.capacity() {
-            2 => *electron_configuration[so.quantum_number() as usize - 1].s.electrons_as_mut() = so.electrons(),
-            6 => *electron_configuration[so.quantum_number() as usize - 1].p.electrons_as_mut() = so.electrons(),
-            10 => *electron_configuration[so.quantum_number() as usize - 1].d.electrons_as_mut() = so.electrons(),
-            14 => *electron_configuration[so.quantum_number() as usize - 1].f.electrons_as_mut() = so.electrons(),
+            2 => {
+                *electron_configuration[so.quantum_number() as usize - 1]
+                    .s
+                    .electrons_as_mut() = so.electrons()
+            }
+            6 => {
+                *electron_configuration[so.quantum_number() as usize - 1]
+                    .p
+                    .electrons_as_mut() = so.electrons()
+            }
+            10 => {
+                *electron_configuration[so.quantum_number() as usize - 1]
+                    .d
+                    .electrons_as_mut() = so.electrons()
+            }
+            14 => {
+                *electron_configuration[so.quantum_number() as usize - 1]
+                    .f
+                    .electrons_as_mut() = so.electrons()
+            }
             cap => panic!("Invalid suborbital capacity [{cap}]"),
         });
 

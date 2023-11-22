@@ -48,8 +48,6 @@ impl ToTokens for ElectronData {
     }
 }
 
-
-
 fn slice_to_tokens<T: ToTokens, const N: usize>(s: [T; N]) -> TokenStream {
     let item = s.iter();
 

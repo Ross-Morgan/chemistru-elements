@@ -200,11 +200,16 @@ macro_rules! suborbital {
     };
 }
 
-
 impl ToString for EnergyLevel {
     fn to_string(&self) -> String {
-        format!("{} {} {} {}", self.s.to_string(), self.p.to_string(), self.d.to_string(), self.f.to_string())
-            .trim()
-            .to_string()
+        format!(
+            "{} {} {} {}",
+            self.s.to_string(),
+            self.p.to_string(),
+            self.d.to_string(),
+            self.f.to_string()
+        )
+        .trim()
+        .to_string()
     }
 }

@@ -71,17 +71,17 @@ impl Elemental for Element {
     fn symbol(&self) -> String {
         self.symbol()
     }
-    
+
     #[inline(always)]
     fn atomic_mass(&self) -> f64 {
         self.atomic_mass()
     }
-    
+
     #[inline(always)]
     fn atomic_number(&self) -> u8 {
         self.atomic_number()
     }
-    
+
     #[inline(always)]
     fn data(&self) -> &'static InnerElement {
         self.data()
@@ -90,6 +90,6 @@ impl Elemental for Element {
 
 impl PartialEq for Element {
     fn eq(&self, other: &Self) -> bool {
-        (self.atomic_mass, self.atomic_number) == (other.atomic_mass, other.atomic_number)        
+        (self.atomic_mass, self.atomic_number) == (other.atomic_mass, other.atomic_number)
     }
 }

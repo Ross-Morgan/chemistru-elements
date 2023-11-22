@@ -1,5 +1,5 @@
-use proc_macro2::{TokenStream, TokenTree, Group, Delimiter};
-use quote::{ToTokens, TokenStreamExt,   quote};
+use proc_macro2::{Delimiter, Group, TokenStream, TokenTree};
+use quote::{quote, ToTokens, TokenStreamExt};
 
 use crate::suborbital;
 
@@ -32,7 +32,8 @@ impl ElectronConfiguration {
     }
 
     pub fn shells(&self) -> Vec<EnergyLevel> {
-        let n = self.0
+        let n = self
+            .0
             .iter()
             .find(|&e| e.s.electrons() + e.p.electrons() + e.d.electrons() + e.f.electrons() == 0)
             .map(|e| e.quantum_number() - 1)

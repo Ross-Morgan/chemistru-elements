@@ -1,4 +1,7 @@
-use crate::{element::{Elemental, Element}, inner::InnerElement};
+use crate::{
+    element::{Element, Elemental},
+    inner::InnerElement,
+};
 
 pub struct Ion {
     pub element: Element,
